@@ -104,7 +104,10 @@
 ;;; repeat-rows returns a pattern made up of nrepeat copies of
 ;;; pattern, appended vertically (above and below each other)
 (define (repeat-rows nrepeat pattern)
-  (make-pattern (* (pattern-numrows pattern) nrepeat) (pattern-numcols pattern) (lambda (row col) ((pattern-fn pattern) (modulo row (pattern-numrows pattern)) col)))
+  (make-pattern
+   (* (pattern-numrows pattern) nrepeat)
+   (pattern-numcols pattern)
+   (lambda (row col) ((pattern-fn pattern) (modulo row (pattern-numrows pattern)) col)))
   )
 
 ;;; append cols returns the pattern made by appending pattern2 to the right of pattern1
@@ -131,11 +134,12 @@
 
 ;;; flip-cols returns a pattern that is the left-right mirror image of pattern
 (define (flip-cols pattern)
-  '( ) ;;replace this line
-  )
+  (make-pattern (pattern-numrows pattern) (pattern-numcols pattern)
+                (lambda (r c) ((pattern-fn pattern) r (- (- (pattern-numcols pattern) c) 1)))
+                ))
 
 ;;; flip-rows returns a pattern that is the up-down mirror image of pattern
 (define (flip-rows pattern)
-  '( ) ;; replace this line
-
-  )
+(make-pattern (pattern-numrows pattern) (pattern-numcols pattern)
+                (lambda (r c) ((pattern-fn pattern) (- (- (pattern-numrows pattern) r) 1) c))
+                ))
