@@ -44,8 +44,11 @@
 ;;;  0 <= row < numrows and similarly for col and numcols.  If both row and col are in range
 ;;;  range-check returns #t, otherwise #f
 (define (range-check row numrows col numcols)
-  '( ) ;; replace this line
-  )
+  (cond ((< row 0) #f)
+        ((>= row numrows) #f)
+        ((< col 0) #f)
+        ((>= col numcols) #f)
+        (else #t)))
 
 ;;; add-check takes 3 arguments: fn, numrows and numcols.  Fn is a
 ;;; function of two numbers, row and col.  add-check returns a new
@@ -101,19 +104,29 @@
 ;;; repeat-rows returns a pattern made up of nrepeat copies of
 ;;; pattern, appended vertically (above and below each other)
 (define (repeat-rows nrepeat pattern)
-  ' ( ) ;; fill in  here
+  (make-pattern (* (pattern-numrows pattern) nrepeat) (pattern-numcols pattern) (lambda (row col) ((pattern-fn pattern) (modulo row (pattern-numrows pattern)) col)))
   )
 
 ;;; append cols returns the pattern made by appending pattern2 to the right of pattern1
 ;;; the number of rows in the resulting pattern is the smaller of the number of rows in pattern1 and patten2
 (define (append-cols pattern1 pattern2)
-  '( ) ;; replace this line
+  (make-pattern (if (< (pattern-numrows pattern1) (pattern-numrows pattern2)) (pattern-numrows pattern1) (pattern-numrows pattern2))
+                (+ (pattern-numcols pattern1) (pattern-numcols pattern2))
+                (lambda (r c)
+                       (if (< c (pattern-numcols pattern1)) ((pattern-fn pattern1) r c)
+                           ((pattern-fn pattern2) r (- c (pattern-numcols pattern1))))
+                       ))
   )
 
 ;;; append-rows returns the pattern made by appending pattern2 below pattern1
 ;;; the number of columns in the resulting pattern is the smaller of the number of columns in pattern1 and patten2
 (define (append-rows pattern1 pattern2)
-  '( );; replace this line
+ (make-pattern  (+ (pattern-numrows pattern1) (pattern-numrows pattern2))
+                (if (< (pattern-numcols pattern1) (pattern-numcols pattern2)) (pattern-numcols pattern1) (pattern-numcols pattern2))
+                (lambda (r c)
+                       (if (< r (pattern-numrows pattern1)) ((pattern-fn pattern1) r c)
+                           ((pattern-fn pattern2) (- r (pattern-numrows pattern1)) c))
+                       ))
   )
 
 ;;; flip-cols returns a pattern that is the left-right mirror image of pattern
